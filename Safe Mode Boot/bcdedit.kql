@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where FileName == "bcdedit.exe"
+| where ProcessCommandLine has_any ("safeboot", "safeboot:minimal", "safeboot:network")  // Filters for commands that trigger safe mode
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+| order by TimeGenerated desc
