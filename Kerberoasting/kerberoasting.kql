@@ -1,0 +1,8 @@
+SecurityEvent
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where EventID == 4769  // Event ID for Kerberos service ticket requests
+| where TicketOptions has "0x40810000"  // Indicates RC4 encryption, common for Kerberoasting attacks
+| where ServiceName != "krbtgt"  // Exclude requests for the Kerberos ticket-granting service (TGT)
+| where AccountType == "User"  // Focus on non-privileged user accounts
+| project TimeGenerated, TargetUserName, ServiceName, ServiceSid, TicketEncryptionType, IpAddress, TargetDomainName, AccountName
+| order by TimeGenerated desc
