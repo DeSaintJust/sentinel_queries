@@ -1,0 +1,9 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Monitor process events for the use of vssadmin
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName == "vssadmin.exe"  // Focus on the vssadmin executable
+| where ProcessCommandLine contains "delete shadows"  // Look for delete command in command line
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, ProcessId, ParentProcessId
+| order by TimeGenerated desc
