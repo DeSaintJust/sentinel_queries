@@ -1,0 +1,22 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let suspiciousPaths = dynamic(["C:\\Users\\*", "C:\\Temp\\", "C:\\AppData\\Local\\Temp\\"]);  // Common writable paths
+
+// Step 1: Monitor process creation events for DLL loading
+let dllEvents = DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName has "exe"  // Focus on executable processes
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, ProcessId;
+
+// Step 2: Monitor loaded DLLs
+let loadedDlls = DeviceImageLoadEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ImagePath has_any (suspiciousPaths)  // Look for DLLs loaded from suspicious paths
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ImagePath, ProcessId;
+
+// Combine results to find correlations between process creation and suspicious DLL loading
+dllEvents
+| join kind=inner (loadedDlls) on ProcessId
+| project dllEvents.TimeGenerated, dllEvents.DeviceName, 
+         dllEvents.InitiatingProcessAccountName, dllEvents.FileName, 
+         loadedDlls.ImagePath
+| order by dllEvents.TimeGenerated desc
