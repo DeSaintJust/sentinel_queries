@@ -1,0 +1,12 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let criticalServices = dynamic(["wuauserv", "bits", "MpsSvc", "Spooler", "wlidsvc"]);  // Add critical services to monitor
+
+// Monitor service stop events
+SecurityEvent
+| where TimeGenerated >= ago(TimeWindow)
+| where EventID == 7036  // Event ID for service state change
+| where EventData contains "stopped"  // Look for services that have stopped
+| extend ServiceName = tostring(split(EventData, " ")[1])  // Extract service name
+| where ServiceName in (criticalServices)  // Filter for critical services
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ServiceName, EventData
+| order by TimeGenerated desc
