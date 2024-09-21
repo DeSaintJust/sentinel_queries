@@ -1,0 +1,12 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust time range as needed
+| where FileName has_any ("mimikatz.exe", "mimi.exe", "mimidrv.sys", "mimilove.exe")  // Common filenames associated with Mimikatz
+or ProcessCommandLine has_any ("sekurlsa::logonpasswords", "sekurlsa::pth", "sekurlsa::tickets", "lsadump::sam", "kerberos::list", "privilege::debug", "token::elevate")  // Mimikatz specific commands
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+| order by TimeGenerated desc
+
+DeviceImageLoadEvents
+| where TimeGenerated >= ago(30d)
+| where FileName has_any ("mimidrv.sys", "mimilib.dll")  // Known Mimikatz-related drivers and DLLs
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by TimeGenerated desc
