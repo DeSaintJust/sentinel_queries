@@ -1,0 +1,23 @@
+let TimeWindow = 30m;  // Adjust the time window as needed
+let archivingTools = dynamic(["zip.exe", "7z.exe", "tar.exe", "winrar.exe"]);  // Add any other tools as needed
+let threshold = 100;  // Set a threshold for the number of files archived
+
+// Step 1: Monitor process events for archiving tools
+let archivingEvents = DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName in (archivingTools)
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, ProcessId;
+
+// Step 2: Count archived files based on file events
+let fileEvents = DeviceFileEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "Create"  // Focus on file creation events
+| summarize ArchivedFilesCount = count() by DeviceName, InitiatingProcessAccountName, bin(TimeGenerated, 5m)
+| where ArchivedFilesCount >= threshold;  // Filter based on the defined threshold
+
+// Combine results to find correlations
+archivingEvents
+| join kind=inner (fileEvents) on DeviceName, InitiatingProcessAccountName
+| project archivingEvents.TimeGenerated, archivingEvents.DeviceName, archivingEvents.InitiatingProcessAccountName,
+         archivingEvents.FileName, archivingEvents.ProcessCommandLine, fileEvents.ArchivedFilesCount
+| order by archivingEvents.TimeGenerated desc
