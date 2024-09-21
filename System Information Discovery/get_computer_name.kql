@@ -1,0 +1,7 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where FileName has "powershell.exe" or FileName has "cmd.exe" or FileName has "wscript.exe" or FileName has "cscript.exe"
+| where ProcessCommandLine has "GetComputerName"  // Look for the use of GetComputerName
+| where DeviceName == "your_device_name"  // Replace with the actual device name
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+| order by TimeGenerated desc
