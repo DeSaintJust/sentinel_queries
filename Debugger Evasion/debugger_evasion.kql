@@ -1,0 +1,12 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Define common API calls used to check for a debugger
+let debuggerCheckAPIs = dynamic(["IsDebuggerPresent", "CheckRemoteDebuggerPresent", "OutputDebugString", "DebugActiveProcess"]);
+
+// Monitor process events for known patterns indicating a debugger check
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName has_any ("malicious.exe", "suspicious_tool.exe") // Replace with actual malware or tools of interest
+| where ProcessCommandLine has_any (debuggerCheckAPIs)
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, ProcessId, ParentProcessId
+| order by TimeGenerated desc
