@@ -1,0 +1,5 @@
+SignInLogs
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed (e.g., 30 days)
+| where UserPrincipalName == "user@example.com"  // Replace with the user's principal name or filter by other criteria
+| project TimeGenerated, UserPrincipalName, AppDisplayName, AuthenticationRequirement, Status, Location
+| order by TimeGenerated desc
