@@ -1,0 +1,8 @@
+SecurityEvent
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where EventID in (4624, 4625)  // 4624 = Successful logon, 4625 = Failed logon
+| where LogonType in (2, 3)  // Type 2 = Interactive, Type 3 = Network
+| where AccountName != "ANONYMOUS LOGON"  // Exclude anonymous logons
+| where TargetUserName != ""  // Ensure there is a target user
+| project TimeGenerated, AccountName, TargetUserName, SourceIpAddress, WorkstationName, LogonType, EventID
+| order by TimeGenerated desc
