@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where ProcessCommandLine has_any ("wscript", "cscript", "vbs", "vba", "excel.exe", "winword.exe") 
+    or FileName has_any ("wscript.exe", "cscript.exe", "mshta.exe", "excel.exe", "winword.exe")
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessParentFileName
+| order by TimeGenerated desc
