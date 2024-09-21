@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where FileName == "rundll32.exe"
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+| order by TimeGenerated desc
