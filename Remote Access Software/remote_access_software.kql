@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where FileName in ("TeamViewer.exe", "AnyDesk.exe", "LogMeIn.exe", "RemoteSupport.exe", "Zoom.exe", "mstsc.exe")  // List of known remote access software
+| where DeviceName == "your_device_name"  // Replace with the actual device name
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+| order by TimeGenerated desc
