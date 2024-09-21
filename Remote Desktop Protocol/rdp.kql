@@ -1,0 +1,7 @@
+SecurityEvent
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where EventID in (4624, 4625)  // 4624 = Successful logon, 4625 = Failed logon
+| where LogonType == 10  // Logon Type 10 indicates RemoteInteractive (RDP)
+| where AccountName != "ANONYMOUS LOGON"  // Exclude anonymous logons
+| project TimeGenerated, AccountName, TargetUserName, SourceIpAddress, WorkstationName, LogonType, EventID
+| order by TimeGenerated desc
