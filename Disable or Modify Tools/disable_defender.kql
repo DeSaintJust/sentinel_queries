@@ -1,0 +1,12 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Define event IDs related to disabling Windows Defender
+let defenderDisableEvents = dynamic([5007, 5008, 5010, 5011]);  // Event IDs can vary; adjust as necessary
+
+// Monitor security events for changes related to Windows Defender
+SecurityEvent
+| where TimeGenerated >= ago(TimeWindow)
+| where EventID in (defenderDisableEvents)
+| where EventData contains "Windows Defender" or EventData contains "Real-time protection" or EventData contains "Turned off"
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, EventID, EventData
+| order by TimeGenerated desc
