@@ -1,0 +1,10 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let suspiciousFileExtensions = dynamic([".exe", ".dll", ".pdf", ".docx", ".xlsx"]);  // Add more extensions as needed
+
+// Monitor file creation events for potentially suspicious files
+DeviceFileEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "Created"  // Focus on file creation events
+| where FileName endswith any (suspiciousFileExtensions)  // Check for suspicious file types
+| project TimeGenerated, DeviceName, FileName, FilePath, FileSize, InitiatingProcessAccountName
+| order by TimeGenerated desc
