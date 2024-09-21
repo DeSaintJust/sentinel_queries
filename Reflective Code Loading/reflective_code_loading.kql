@@ -1,0 +1,8 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where (FileName == "powershell.exe" and ProcessCommandLine has "Invoke-Expression") // PowerShell reflective loading
+   or (FileName == "rundll32.exe" and ProcessCommandLine has "your_dll_name")  // Detect use of rundll32.exe with specific DLLs
+   or (FileName == "wmic.exe" and ProcessCommandLine has "process call create")  // WMIC reflective loading
+   or (FileName has_any ("mimikatz.exe", "cobaltstrike.exe")) // Known tools
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+| order by TimeGenerated desc
