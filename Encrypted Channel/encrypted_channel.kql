@@ -1,0 +1,6 @@
+DeviceNetworkEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where RemotePort in (443, 22, 465, 993, 995)  // Common ports for HTTPS (443), SSH (22), SMTPS (465), IMAPS (993), POP3S (995)
+| or Protocol in ("TLS", "SSL", "HTTPS", "SSH")  // Common encryption protocols
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, RemoteIp, RemotePort, Protocol, RemoteUrl, InitiatingProcessFileName
+| order by TimeGenerated desc
