@@ -1,0 +1,22 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let impacketExecutables = dynamic(["psexec.py", "wmic.py", "smbexec.py", "ntlmrelayx.py", "tickle.py"]);  // Add more Impacket-related scripts as needed
+
+// Step 1: Monitor process creation events for Impacket executables
+let impacketEvents = DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName in (impacketExecutables)
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, ProcessId, ParentProcessId;
+
+// Step 2: Monitor network events for suspicious connections typical of Impacket usage
+let networkEvents = DeviceNetworkEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where RemoteUrl has "suspicious.com"  // Replace with known malicious domains or IPs if available
+| project TimeGenerated, DeviceName, RemoteUrl, InitiatingProcessFileName;
+
+// Combine results to identify potential Impacket usage
+impacketEvents
+| join kind=inner (networkEvents) on DeviceName
+| project impacketEvents.TimeGenerated, impacketEvents.DeviceName, 
+         impacketEvents.InitiatingProcessAccountName, impacketEvents.FileName, 
+         impacketEvents.ProcessCommandLine, networkEvents.RemoteUrl
+| order by impacketEvents.TimeGenerated desc
