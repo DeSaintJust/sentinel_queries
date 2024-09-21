@@ -1,0 +1,29 @@
+let SuspiciousFileExtensions = dynamic([".exe", ".dll", ".js", ".vbs", ".scr", ".cmd"]);
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Step 1: Detect suspicious HTML file access
+let htmlFiles = DeviceFileEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName endswith ".html" or FileName endswith ".htm"
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, FilePath;
+
+// Step 2: Detect script execution that may indicate payload delivery
+let suspiciousScripts = DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName has_any("powershell.exe", "wscript.exe", "cscript.exe", "mshta.exe")
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine;
+
+// Step 3: Detect file downloads with suspicious extensions
+let suspiciousDownloads = DeviceNetworkEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where RemoteUrl has_any("malicious-domain.com", "example.com")  // Replace with known malicious domains
+| where FileName endswith any(SuspiciousFileExtensions)
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, RemoteUrl, FileName;
+
+// Combine results to correlate potential HTML smuggling activity
+htmlFiles
+| join kind=inner (suspiciousScripts) on DeviceName
+| join kind=inner (suspiciousDownloads) on DeviceName
+| project htmlFiles.TimeGenerated, htmlFiles.DeviceName, htmlFiles.InitiatingProcessAccountName, 
+         htmlFiles.FileName, suspiciousScripts.FileName, suspiciousDownloads.RemoteUrl, suspiciousDownloads.FileName
+| order by htmlFiles.TimeGenerated desc
