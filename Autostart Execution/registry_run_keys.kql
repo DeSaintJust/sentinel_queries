@@ -1,0 +1,15 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Define the registry paths for run keys
+let runKeyPaths = dynamic([
+    @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run",
+    @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run"
+]);
+
+// Monitor registry events for creation of run keys
+DeviceRegistryEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "Create"  // Filter for creation events
+| where RegistryPath in (runKeyPaths)  // Check for run key paths
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, RegistryPath, ValueName, ValueData
+| order by TimeGenerated desc
