@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where FileName == "regsvr32.exe"
+| where ProcessCommandLine has_any (".dll", "/i", "/s")  // Common flags and DLL extension used with regsvr32.exe
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+| order by TimeGenerated desc
