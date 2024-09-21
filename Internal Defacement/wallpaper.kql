@@ -1,0 +1,9 @@
+DeviceRegistryEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where RegistryKey has_any (
+    @"HKEY_CURRENT_USER\Control Panel\Desktop\Wallpaper",
+    @"HKEY_CURRENT_USER\Control Panel\Desktop\TileWallpaper",
+    @"HKEY_CURRENT_USER\Control Panel\Desktop\WallpaperStyle"
+)
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, RegistryKey, RegistryValueName, RegistryValueData, ActionType, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by TimeGenerated desc
