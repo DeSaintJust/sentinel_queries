@@ -1,0 +1,23 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Define a list of known malicious domains or URLs
+let maliciousDomains = dynamic(["malicious.com", "phishing-site.com", "suspicious-url.com"]);  // Add more known domains
+
+// Step 1: Monitor network events for suspicious URLs
+let maliciousLinkClicks = DeviceNetworkEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where RemoteUrl has_any(maliciousDomains)  // Check for known malicious domains
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, RemoteUrl, ActionType;
+
+// Step 2: Join with process events to identify the application used for the click
+let processEvents = DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessId;
+
+// Combine results to find correlations between clicks and the originating process
+maliciousLinkClicks
+| join kind=inner (processEvents) on DeviceName
+| project maliciousLinkClicks.TimeGenerated, maliciousLinkClicks.DeviceName, 
+         maliciousLinkClicks.InitiatingProcessAccountName, maliciousLinkClicks.RemoteUrl, 
+         processEvents.FileName
+| order by maliciousLinkClicks.TimeGenerated desc
