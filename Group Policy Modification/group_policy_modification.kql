@@ -1,0 +1,7 @@
+SecurityEvent
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where EventID in (5136, 5137, 5139, 5141)  // Group Policy object change events
+| where TargetObject startswith "CN=Policies,"  // Filters for changes related to Group Policies in Active Directory
+| where DomainName == "yourdomain.com"  // Replace with the domain name you're interested in
+| project TimeGenerated, EventID, TargetObject, ObjectClass, SubjectUserName, SubjectDomainName, ActionType, EventData
+| order by TimeGenerated desc
