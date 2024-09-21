@@ -1,0 +1,9 @@
+let MaliciousScriptExtensions = dynamic([".ps1", ".vbs", ".js", ".bat", ".cmd"]);
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+DeviceFileEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "Delete"  // Filter for deletion events
+| where FileName has_any (MaliciousScriptExtensions)  // Check for known malicious script extensions
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, FilePath, ActionType
+| order by TimeGenerated desc
