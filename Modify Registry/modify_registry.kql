@@ -1,0 +1,5 @@
+DeviceRegistryEvents
+| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+| where DeviceName == "device_name"  // Replace with the actual device name
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, RegistryKey, RegistryValueName, ActionType, InitiatingProcessFileName, InitiatingProcessCommandLine
+| order by TimeGenerated desc
