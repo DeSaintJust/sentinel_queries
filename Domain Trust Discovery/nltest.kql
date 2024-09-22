@@ -1,0 +1,11 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let NltestCommand = "nltest";  // Command to monitor
+let TrustDiscoveryOptions = dynamic(["/domain_trusts", "/trusts"]); // Options related to trust discovery
+
+// Monitor for process creation events involving nltest command
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where InitiatingProcessFileName == NltestCommand  // Filter for nltest command
+| where ProcessCommandLine has_any (TrustDiscoveryOptions)  // Check for trust discovery options in the command line
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath
+| order by TimeGenerated desc
