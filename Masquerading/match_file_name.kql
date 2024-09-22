@@ -1,0 +1,25 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Monitor process creation events from Sysmon and Security logs
+let sysmon_events = SecurityEvent
+| where TimeGenerated >= ago(TimeWindow)
+| where EventID == 4688;  // Security log process creation event
+
+let win_event_logs = SysmonEvent
+| where TimeGenerated >= ago(TimeWindow)
+| where EventID == 1;  // Sysmon process creation event
+
+sysmon_events
+| union win_event_logs
+| where (FileName == "svchost.exe" and (FolderPath != @"C:\Windows\System32\svchost.exe" or FolderPath != @"C:\Windows\SysWow64\svchost.exe"))
+       or (FileName == "smss.exe" and FolderPath != @"C:\Windows\System32\smss.exe")
+       or (FileName == "wininit.exe" and FolderPath != @"C:\Windows\System32\wininit.exe")
+       or (FileName == "taskhost.exe" and FolderPath != @"C:\Windows\System32\taskhost.exe")
+       or (FileName == "lsass.exe" and FolderPath != @"C:\Windows\System32\lsass.exe")
+       or (FileName == "winlogon.exe" and FolderPath != @"C:\Windows\System32\winlogon.exe")
+       or (FileName == "csrss.exe" and FolderPath != @"C:\Windows\System32\csrss.exe")
+       or (FileName == "services.exe" and FolderPath != @"C:\Windows\System32\services.exe")
+       or (FileName == "lsm.exe" and FolderPath != @"C:\Windows\System32\lsm.exe")
+       or (FileName == "explorer.exe" and FolderPath != @"C:\Windows\explorer.exe")
+| project TimeGenerated, FileName, FolderPath, InitiatingProcessFileName, InitiatingProcessFolderPath, EventData
+| order by TimeGenerated desc
