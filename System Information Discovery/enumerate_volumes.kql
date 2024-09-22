@@ -1,0 +1,12 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let MinOccurrences = 5;  // Minimum number of calls to consider suspicious
+
+// Monitor for API calls to FindFirstVolumeW and FindNextVolumeW
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "ApiCall"  // Filter for API call events
+| where ApiName in ("FindFirstVolumeW", "FindNextVolumeW")  // Focus on specific API calls
+| summarize CallCount = count() by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, bin(TimeGenerated, 1h)
+| where CallCount >= MinOccurrences  // Filter for processes making repeated calls
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, CallCount
+| order by TimeGenerated desc
