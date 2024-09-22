@@ -1,0 +1,15 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let WindowEnumerationFunctions = dynamic([
+    "EnumWindows", 
+    "GetWindowText", 
+    "GetWindow", 
+    "EnumChildWindows"
+]);
+
+// Monitor for process creation events involving window enumeration functions
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "ApiCall"  // Focus on API call events
+| where ApiName in (WindowEnumerationFunctions)  // Check for specific functions used in window enumeration
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName, ApiName
+| order by TimeGenerated desc
