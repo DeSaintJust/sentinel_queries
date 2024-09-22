@@ -1,0 +1,11 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let targetProcesses = dynamic(["explorer.exe", "svchost.exe", "lsass.exe"]);  // Add other high-value processes as needed
+
+// Monitor process events and look for potential process injection
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName in (targetProcesses)  // Focus on high-value target processes like explorer.exe
+| where InitiatingProcessFileName != FileName  // Look for processes started by other processes (potential injection)
+| extend InjectionIndicator = iff(InitiatingProcessFileName != FileName, "Possible Injection", "Legitimate Process")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, FileName, ProcessId, InitiatingProcessId, InjectionIndicator
+| order by TimeGenerated desc
