@@ -1,0 +1,11 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let RequiredLibraries = dynamic(["kernel32.dll", "networkexplorer.dll", "NlsData0000.dll"]); // Libraries that must be loaded
+let ForbiddenLibraries = dynamic(["NetProjW.dll", "Ghofr.dll", "fg122.dll"]); // Libraries that must not be loaded
+
+// Monitor for process creation events involving library checks
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "ApiCall"  // Focus on API call events
+| where (ApiName has_any(RequiredLibraries) and not(ApiName has_any(ForbiddenLibraries))) // Check for required libraries and exclude forbidden ones
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName, ApiName
+| order by TimeGenerated desc
