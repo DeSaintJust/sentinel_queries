@@ -1,0 +1,12 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let SamAccountTypeFilter = "(&(samAccountType=805306369))";  // LDAP filter for computer objects
+
+// Monitor for network traffic to LDAP servers
+DeviceNetworkEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where RemotePort == 389 or RemotePort == 636  // Standard LDAP ports (LDAP and LDAPS)
+| where RemoteUrl has "ldap"  // Ensure the event is related to LDAP
+| where ProcessName in ("lsass.exe", "ldap.exe", "Active Directory")  // Filter by relevant processes
+| where RequestUri has SamAccountTypeFilter  // Filter for LDAP queries for computers by samAccountType
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, RemoteUrl, ProcessName, RequestUri
+| order by TimeGenerated desc
