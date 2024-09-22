@@ -1,0 +1,11 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Monitor security events for user added to local groups
+SecurityEvent
+| where TimeGenerated >= ago(TimeWindow)
+| where EventID == 4732  // Event ID for a member being added to a local group
+| extend TargetGroup = tostring(parse_json(EventData)["TargetSid"])  // Extract the group SID
+| where TargetGroup == "S-1-5-32-544"  // SID for the Administrators group
+| extend AddedMember = tostring(parse_json(EventData)["MemberName"])  // Extract the account being added
+| project TimeGenerated, DeviceName, AddedMember, InitiatingProcessAccountName, EventData
+| order by TimeGenerated desc
