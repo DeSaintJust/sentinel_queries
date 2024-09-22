@@ -1,11 +1,35 @@
-let TimeWindow = 30d;  // Adjust the time window as needed
+name: <insert name here>
+description: |
+  <insert description here>
+severity: <insert severity here>
+status: <insert status here>
+requiredDataConnectors:
+  - connectorId: <insert connector ID here>
+    dataTypes:
+      - <insert required data types here>
+queryFrequency: <insert query frequency here>
+queryPeriod: <insert query period here>
+triggerOperator: <insert trigger operator here>
+triggerThreshold: <insert trigger threshold here>
+tactics:
+  - <e.g., InitialAccess>
+relevantTechniques:
+  - <e.g., t144420>
+tags:
+  - <e.g., Tag Name>
+query: |
+  let TimeWindow = 30d;  // Adjust the time window as needed
 
-// Monitor security events for user added to local groups
-SecurityEvent
-| where TimeGenerated >= ago(TimeWindow)
-| where EventID == 4732  // Event ID for a member being added to a local group
-| extend TargetGroup = tostring(parse_json(EventData)["TargetSid"])  // Extract the group SID
-| where TargetGroup == "S-1-5-32-544"  // SID for the Administrators group
-| extend AddedMember = tostring(parse_json(EventData)["MemberName"])  // Extract the account being added
-| project TimeGenerated, DeviceName, AddedMember, InitiatingProcessAccountName, EventData
-| order by TimeGenerated desc
+  // Monitor security events for user added to local groups
+  SecurityEvent
+  | where TimeGenerated >= ago(TimeWindow)
+  | where EventID == 4732  // Event ID for a member being added to a local group
+  | extend TargetGroup = tostring(parse_json(EventData)["TargetSid"])  // Extract the group SID
+  | where TargetGroup == "S-1-5-32-544"  // SID for the Administrators group
+  | extend AddedMember = tostring(parse_json(EventData)["MemberName"])  // Extract the account being added
+  | project TimeGenerated, DeviceName, AddedMember, InitiatingProcessAccountName, EventData
+  | order by TimeGenerated desc
+entityMappings:
+  - <insert entity mappings here>
+version: <e.g., 1.0.0>
+kind: <e.g., Scheduled>
