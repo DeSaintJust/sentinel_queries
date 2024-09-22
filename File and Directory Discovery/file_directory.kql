@@ -18,6 +18,8 @@ relevantTechniques:
 tags:
   - <e.g., Tag Name>
 query: |
+  let TimeWindow = 30d;  // Adjust the time window as needed
+  let MinOccurrences = 5;  // Adjust the threshold for the minimum number of calls  
   // Monitor for API calls to FindFirstFileW and FindNextFileW
   DeviceProcessEvents
   | where TimeGenerated >= ago(TimeWindow)
@@ -31,6 +33,3 @@ entityMappings:
   - <insert entity mappings here>
 version: <e.g., 1.0.0>
 kind: <e.g., Scheduled>
-
-let TimeWindow = 30d;  // Adjust the time window as needed
-let MinOccurrences = 5;  // Adjust the threshold for the minimum number of calls
