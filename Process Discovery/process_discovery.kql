@@ -1,0 +1,17 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let ProcessCheckFunctions = dynamic([
+    "OpenProcess", 
+    "EnumProcesses", 
+    "CreateToolhelp32Snapshot", 
+    "Process32First", 
+    "Process32Next", 
+    "NtQuerySystemInformation"
+]);
+
+// Monitor for API calls related to process enumeration
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ActionType == "ApiCall"  // Focus on API call events
+| where ApiName in (ProcessCheckFunctions)  // Check for specific functions used in process checks
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName, ApiName
+| order by TimeGenerated desc
