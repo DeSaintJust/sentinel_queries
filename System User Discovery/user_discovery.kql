@@ -1,0 +1,15 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let UserEnumerationCommands = dynamic([
+    "net user", 
+    "Get-LocalUser", 
+    "Get-ADUser", 
+    "Get-WmiObject Win32_UserProfile",
+    "net localgroup"
+]);
+
+// Monitor for process creation events involving user enumeration commands
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ProcessCommandLine has_any (UserEnumerationCommands)  // Check for user enumeration commands in the command line
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName
+| order by TimeGenerated desc
