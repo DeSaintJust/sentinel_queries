@@ -18,6 +18,9 @@ relevantTechniques:
 tags:
   - <e.g., Tag Name>
 query: |
+  let TimeWindow = 30d;  // Adjust the time window as needed
+  let NltestCommand = "nltest";  // Command to monitor
+  let TrustDiscoveryOptions = dynamic(["/domain_trusts", "/trusts"]); // Options related to trust discovery
   // Monitor for process creation events involving nltest command
   DeviceProcessEvents
   | where TimeGenerated >= ago(TimeWindow)
@@ -29,7 +32,3 @@ entityMappings:
   - <insert entity mappings here>
 version: <e.g., 1.0.0>
 kind: <e.g., Scheduled>
-
-let TimeWindow = 30d;  // Adjust the time window as needed
-let NltestCommand = "nltest";  // Command to monitor
-let TrustDiscoveryOptions = dynamic(["/domain_trusts", "/trusts"]); // Options related to trust discovery
