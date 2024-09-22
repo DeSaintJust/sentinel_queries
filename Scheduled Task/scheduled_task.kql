@@ -1,0 +1,9 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Monitor for scheduled task creation events
+SecurityEvent
+| where TimeGenerated >= ago(TimeWindow)
+| where EventID == 4698  // Event ID for scheduled task creation
+| extend TaskName = tostring(parse_json(EventData)["TaskName"])  // Extract the scheduled task name
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, TaskName, EventData
+| order by TimeGenerated desc
