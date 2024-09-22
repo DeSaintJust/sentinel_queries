@@ -1,0 +1,15 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let NetworkEnumerationCommands = dynamic([
+    "netstat", 
+    "Get-NetTCPConnection", 
+    "Get-NetUDPEndpoint", 
+    "Get-NetConnectionProfile",
+    "Get-NetRoute"
+]);
+
+// Monitor for process creation events involving network enumeration commands
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ProcessCommandLine has_any (NetworkEnumerationCommands)  // Check for network enumeration commands in the command line
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName
+| order by TimeGenerated desc
