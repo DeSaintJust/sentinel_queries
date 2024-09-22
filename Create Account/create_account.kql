@@ -1,0 +1,11 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let suspiciousUserNames = dynamic(["admin", "r", "temp"]);  // Add more suspicious usernames if necessary
+
+// Monitor user account creation events
+SecurityEvent
+| where TimeGenerated >= ago(TimeWindow)
+| where EventID == 4720  // Event ID for user account creation
+| extend AccountName = tostring(parse_json(EventData)["TargetUserName"])  // Extract the created account name
+| where AccountName in (suspiciousUserNames)  // Filter for suspicious user names
+| project TimeGenerated, DeviceName, AccountName, InitiatingProcessAccountName, EventData
+| order by TimeGenerated desc
