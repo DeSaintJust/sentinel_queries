@@ -1,0 +1,9 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let ServiceName = "Fax";  // Name of the Windows Fax service
+
+// Monitor for process creation events that might check for the Fax service
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where (ProcessCommandLine has ServiceName and ProcessCommandLine has_any ("sc query", "Get-Service", "net start", "powershell")) // Commands that check for services
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName
+| order by TimeGenerated desc
