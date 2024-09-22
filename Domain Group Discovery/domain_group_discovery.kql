@@ -1,0 +1,15 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let GroupEnumerationCommands = dynamic([
+    "net localgroup", 
+    "net group", 
+    "Get-ADGroup", 
+    "Get-ADGroupMember",
+    "Get-LocalGroup"
+]);
+
+// Monitor for process creation events involving group enumeration commands
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where ProcessCommandLine has_any (GroupEnumerationCommands)  // Check for group enumeration commands in the command line
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName
+| order by TimeGenerated desc
