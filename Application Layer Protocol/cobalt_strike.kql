@@ -1,0 +1,19 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+let SuspiciousUserAgents = dynamic([
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1", 
+    "Microsoft-CryptoAPI/10.0"
+]);
+let SuspiciousDomains = dynamic([
+    "malicious-domain.com",  // Replace with known Cobalt Strike domains or domains from threat intel
+    "example-bad-domain.net"
+]);
+
+// Monitor network communication events for suspicious user-agent strings, domains, or ports used by Cobalt Strike
+DeviceNetworkEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where RemoteUrl has_any (SuspiciousDomains)  // Monitor for known malicious domains
+    or (RemotePort in (80, 443, 53)  // HTTP/S and DNS ports often used for C2
+        and UserAgent in (SuspiciousUserAgents))  // Filter by known suspicious user-agent strings used by Cobalt Strike
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, RemoteUrl, RemoteIP, RemotePort, UserAgent
+| order by TimeGenerated desc
