@@ -1,0 +1,8 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Monitor process creation events for the use of the chmod command
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName == "chmod"  // Look for the chmod command
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FileName, FolderPath, ProcessId
+| order by TimeGenerated desc
