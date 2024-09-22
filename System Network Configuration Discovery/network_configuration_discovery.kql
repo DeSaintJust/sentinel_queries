@@ -1,0 +1,5 @@
+DeviceProcessEvents
+| where TimeGenerated >= ago(30d)  // Adjust time window as needed
+| where ProcessCommandLine has_any ("net", "arp", "ipconfig")
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, InitiatingProcessFileName
+| order by TimeGenerated desc
