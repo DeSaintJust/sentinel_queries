@@ -1,0 +1,9 @@
+let TimeWindow = 30d;  // Adjust the time window as needed
+
+// Monitor process creation events for net.exe with relevant command arguments
+DeviceProcessEvents
+| where TimeGenerated >= ago(TimeWindow)
+| where FileName == "net.exe"  // Focus on net.exe
+| where ProcessCommandLine has_any ("user", "group", "localgroup", "accounts")  // Look for commands related to account discovery
+| project TimeGenerated, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, FolderPath, InitiatingProcessFileName
+| order by TimeGenerated desc
