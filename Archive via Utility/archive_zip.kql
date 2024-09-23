@@ -16,7 +16,8 @@ tactics:
 relevantTechniques:
   - <e.g., t144420>
 tags:
-  - <e.g., Tag Name>
+  - Ransomware
+  - Black Basta
 query: |
          let TimeWindow = 30m;  // Adjust the time window as needed
          let archivingTools = dynamic(["zip.exe", "7z.exe", "tar.exe", "winrar.exe"]);  // Add any other tools as needed
