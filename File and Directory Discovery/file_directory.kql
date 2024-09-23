@@ -16,7 +16,8 @@ tactics:
 relevantTechniques:
   - <e.g., t144420>
 tags:
-  - <e.g., Tag Name>
+  - Ransomware
+  - Black Basta
 query: |
   let TimeWindow = 30d;  // Adjust the time window as needed
   let MinOccurrences = 5;  // Adjust the threshold for the minimum number of calls  
