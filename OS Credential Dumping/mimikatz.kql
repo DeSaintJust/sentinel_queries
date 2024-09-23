@@ -1,12 +1,36 @@
-DeviceProcessEvents
-| where TimeGenerated >= ago(30d)  // Adjust time range as needed
-| where FileName has_any ("mimikatz.exe", "mimi.exe", "mimidrv.sys", "mimilove.exe")  // Common filenames associated with Mimikatz
-or ProcessCommandLine has_any ("sekurlsa::logonpasswords", "sekurlsa::pth", "sekurlsa::tickets", "lsadump::sam", "kerberos::list", "privilege::debug", "token::elevate")  // Mimikatz specific commands
-| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
-| order by TimeGenerated desc
-
-DeviceImageLoadEvents
-| where TimeGenerated >= ago(30d)
-| where FileName has_any ("mimidrv.sys", "mimilib.dll")  // Known Mimikatz-related drivers and DLLs
-| project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, InitiatingProcessFileName, InitiatingProcessCommandLine
-| order by TimeGenerated desc
+name: <insert name here>
+description: |
+  <insert description here>
+severity: <insert severity here>
+status: <insert status here>
+requiredDataConnectors:
+  - connectorId: <insert connector ID here>
+    dataTypes:
+      - <insert required data types here>
+queryFrequency: <insert query frequency here>
+queryPeriod: <insert query period here>
+triggerOperator: <insert trigger operator here>
+triggerThreshold: <insert trigger threshold here>
+tactics:
+  - <e.g., InitialAccess>
+relevantTechniques:
+  - <e.g., t144420>
+tags:
+  - <e.g., Tag Name>
+query: |
+  DeviceProcessEvents
+  | where TimeGenerated >= ago(30d)  // Adjust time range as needed
+  | where FileName has_any ("mimikatz.exe", "mimi.exe", "mimidrv.sys", "mimilove.exe")  // Common filenames associated with Mimikatz
+  or ProcessCommandLine has_any ("sekurlsa::logonpasswords", "sekurlsa::pth", "sekurlsa::tickets", "lsadump::sam", "kerberos::list", "privilege::debug", "token::elevate")  // Mimikatz specific commands
+  | project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessParentFileName
+  | order by TimeGenerated desc
+  
+  DeviceImageLoadEvents
+  | where TimeGenerated >= ago(30d)
+  | where FileName has_any ("mimidrv.sys", "mimilib.dll")  // Known Mimikatz-related drivers and DLLs
+  | project TimeGenerated, DeviceName, InitiatingProcessAccountName, FileName, InitiatingProcessFileName, InitiatingProcessCommandLine
+  | order by TimeGenerated desc
+entityMappings:
+  - <insert entity mappings here>
+version: <e.g., 1.0.0>
+kind: <e.g., Scheduled>
