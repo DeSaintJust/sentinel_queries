@@ -1,5 +1,29 @@
-SignInLogs
-| where TimeGenerated >= ago(30d)  // Adjust the time range as needed (e.g., 30 days)
-| where UserPrincipalName == "user@example.com"  // Replace with the user's principal name or filter by other criteria
-| project TimeGenerated, UserPrincipalName, AppDisplayName, AuthenticationRequirement, Status, Location
-| order by TimeGenerated desc
+name: <insert name here>
+description: |
+  <insert description here>
+severity: <insert severity here>
+status: <insert status here>
+requiredDataConnectors:
+  - connectorId: <insert connector ID here>
+    dataTypes:
+      - <insert required data types here>
+queryFrequency: <insert query frequency here>
+queryPeriod: <insert query period here>
+triggerOperator: <insert trigger operator here>
+triggerThreshold: <insert trigger threshold here>
+tactics:
+  - <e.g., InitialAccess>
+relevantTechniques:
+  - <e.g., t144420>
+tags:
+  - <e.g., Tag Name>
+query: |
+  SignInLogs
+  | where TimeGenerated >= ago(30d)  // Adjust the time range as needed (e.g., 30 days)
+  | where UserPrincipalName == "user@example.com"  // Replace with the user's principal name or filter by other criteria
+  | project TimeGenerated, UserPrincipalName, AppDisplayName, AuthenticationRequirement, Status, Location
+  | order by TimeGenerated desc
+entityMappings:
+  - <insert entity mappings here>
+version: <e.g., 1.0.0>
+kind: <e.g., Scheduled>
