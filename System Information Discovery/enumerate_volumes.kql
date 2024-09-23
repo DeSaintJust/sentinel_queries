@@ -1,12 +1,36 @@
-let TimeWindow = 30d;  // Adjust the time window as needed
-let MinOccurrences = 5;  // Minimum number of calls to consider suspicious
-
-// Monitor for API calls to FindFirstVolumeW and FindNextVolumeW
-DeviceProcessEvents
-| where TimeGenerated >= ago(TimeWindow)
-| where ActionType == "ApiCall"  // Filter for API call events
-| where ApiName in ("FindFirstVolumeW", "FindNextVolumeW")  // Focus on specific API calls
-| summarize CallCount = count() by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, bin(TimeGenerated, 1h)
-| where CallCount >= MinOccurrences  // Filter for processes making repeated calls
-| project TimeGenerated, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, CallCount
-| order by TimeGenerated desc
+name: <insert name here>
+description: |
+  <insert description here>
+severity: <insert severity here>
+status: <insert status here>
+requiredDataConnectors:
+  - connectorId: <insert connector ID here>
+    dataTypes:
+      - <insert required data types here>
+queryFrequency: <insert query frequency here>
+queryPeriod: <insert query period here>
+triggerOperator: <insert trigger operator here>
+triggerThreshold: <insert trigger threshold here>
+tactics:
+  - <e.g., InitialAccess>
+relevantTechniques:
+  - <e.g., t144420>
+tags:
+  - <e.g., Tag Name>
+query: |
+  let TimeWindow = 30d;  // Adjust the time window as needed
+  let MinOccurrences = 5;  // Minimum number of calls to consider suspicious
+  
+  // Monitor for API calls to FindFirstVolumeW and FindNextVolumeW
+  DeviceProcessEvents
+  | where TimeGenerated >= ago(TimeWindow)
+  | where ActionType == "ApiCall"  // Filter for API call events
+  | where ApiName in ("FindFirstVolumeW", "FindNextVolumeW")  // Focus on specific API calls
+  | summarize CallCount = count() by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, bin(TimeGenerated, 1h)
+  | where CallCount >= MinOccurrences  // Filter for processes making repeated calls
+  | project TimeGenerated, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, CallCount
+  | order by TimeGenerated desc
+entityMappings:
+  - <insert entity mappings here>
+version: <e.g., 1.0.0>
+kind: <e.g., Scheduled>
