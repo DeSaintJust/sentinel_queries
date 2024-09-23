@@ -16,7 +16,8 @@ tactics:
 relevantTechniques:
   - <e.g., t144420>
 tags:
-  - <e.g., Tag Name>
+  - Ransomware
+  - Black Basta
 query: |
   <insert query here>
   SecurityEvent
