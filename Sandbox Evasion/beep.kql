@@ -18,18 +18,18 @@ relevantTechniques:
 tags:
   - <e.g., Tag Name>
 query: |
-let TimeWindow = 1d;  // Adjust the time window as needed
-let MinOccurrences = 5;  // Adjust the threshold for the minimum number of beep calls
-
-// Monitor for repeated API calls to kernel32.Beep
-DeviceEvents
-| where TimeGenerated >= ago(TimeWindow)
-| where ActionType == "ApiCall"  // Filter for API call events
-| where AdditionalFields has "kernel32!Beep"  // Look for the kernel32.Beep function call
-| summarize BeepCallCount = count() by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, bin(TimeGenerated, 1h)
-| where BeepCallCount >= MinOccurrences  // Filter for processes making repeated calls
-| project TimeGenerated, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, BeepCallCount
-| order by TimeGenerated desc
+  let TimeWindow = 1d;  // Adjust the time window as needed
+  let MinOccurrences = 5;  // Adjust the threshold for the minimum number of beep calls
+  
+  // Monitor for repeated API calls to kernel32.Beep
+  DeviceEvents
+  | where TimeGenerated >= ago(TimeWindow)
+  | where ActionType == "ApiCall"  // Filter for API call events
+  | where AdditionalFields has "kernel32!Beep"  // Look for the kernel32.Beep function call
+  | summarize BeepCallCount = count() by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, bin(TimeGenerated, 1h)
+  | where BeepCallCount >= MinOccurrences  // Filter for processes making repeated calls
+  | project TimeGenerated, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, BeepCallCount
+  | order by TimeGenerated desc
 entityMappings:
   - <insert entity mappings here>
 version: <e.g., 1.0.0>
