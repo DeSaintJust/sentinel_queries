@@ -1,33 +1,57 @@
-let TimeWindow = 30d;  // Adjust the time window as needed
-
-// Step 1: Detect stopping of a specified service
-let serviceName = "YourServiceName";  // Replace with the name of the service to monitor
-let serviceStopped = SecurityEvent
-| where TimeGenerated >= ago(TimeWindow)
-| where EventID == 7036  // Event ID for service state change
-| where EventData has serviceName and EventData contains "stopped"
-| project StoppedTime = TimeGenerated, DeviceName, InitiatingProcessAccountName, EventData;
-
-// Step 2: Detect deletion of the specified service
-let serviceDeleted = SecurityEvent
-| where TimeGenerated >= ago(TimeWindow)
-| where EventID == 7045  // Event ID for service creation or deletion
-| where EventData has serviceName and EventData contains "deleted"
-| project DeletedTime = TimeGenerated, DeviceName, InitiatingProcessAccountName, EventData;
-
-// Step 3: Detect creation of a new service masquerading as the deleted service
-let maliciousServiceCreated = SecurityEvent
-| where TimeGenerated >= ago(TimeWindow)
-| where EventID == 7045  // Event ID for service creation
-| where EventData has serviceName and EventData has_any ("malicious_service_name", "suspicious_executable_name")  // Replace with actual names
-| project CreatedTime = TimeGenerated, DeviceName, InitiatingProcessAccountName, EventData;
-
-// Combine results
-serviceStopped
-| join kind=inner (serviceDeleted) on DeviceName
-| join kind=inner (maliciousServiceCreated) on DeviceName
-| project StoppedTime, DeletedTime, CreatedTime, DeviceName, InitiatingProcessAccountName,
-         serviceStopped.EventData as StoppedEventData, 
-         serviceDeleted.EventData as DeletedEventData,
-         maliciousServiceCreated.EventData as CreatedEventData
-| order by StoppedTime desc
+name: <insert name here>
+description: |
+  <insert description here>
+severity: <insert severity here>
+status: <insert status here>
+requiredDataConnectors:
+  - connectorId: <insert connector ID here>
+    dataTypes:
+      - <insert required data types here>
+queryFrequency: <insert query frequency here>
+queryPeriod: <insert query period here>
+triggerOperator: <insert trigger operator here>
+triggerThreshold: <insert trigger threshold here>
+tactics:
+  - <e.g., InitialAccess>
+relevantTechniques:
+  - <e.g., t144420>
+tags:
+  - <e.g., Tag Name>
+query: |
+         let TimeWindow = 30d;  // Adjust the time window as needed
+         
+         // Step 1: Detect stopping of a specified service
+         let serviceName = "YourServiceName";  // Replace with the name of the service to monitor
+         let serviceStopped = SecurityEvent
+         | where TimeGenerated >= ago(TimeWindow)
+         | where EventID == 7036  // Event ID for service state change
+         | where EventData has serviceName and EventData contains "stopped"
+         | project StoppedTime = TimeGenerated, DeviceName, InitiatingProcessAccountName, EventData;
+         
+         // Step 2: Detect deletion of the specified service
+         let serviceDeleted = SecurityEvent
+         | where TimeGenerated >= ago(TimeWindow)
+         | where EventID == 7045  // Event ID for service creation or deletion
+         | where EventData has serviceName and EventData contains "deleted"
+         | project DeletedTime = TimeGenerated, DeviceName, InitiatingProcessAccountName, EventData;
+         
+         // Step 3: Detect creation of a new service masquerading as the deleted service
+         let maliciousServiceCreated = SecurityEvent
+         | where TimeGenerated >= ago(TimeWindow)
+         | where EventID == 7045  // Event ID for service creation
+         | where EventData has serviceName and EventData has_any ("malicious_service_name", "suspicious_executable_name")  // Replace with actual names
+         | project CreatedTime = TimeGenerated, DeviceName, InitiatingProcessAccountName, EventData;
+         
+         // Combine results
+         serviceStopped
+         | join kind=inner (serviceDeleted) on DeviceName
+         | join kind=inner (maliciousServiceCreated) on DeviceName
+         | project StoppedTime, DeletedTime, CreatedTime, DeviceName, InitiatingProcessAccountName,
+                  serviceStopped.EventData as StoppedEventData, 
+                  serviceDeleted.EventData as DeletedEventData,
+                  maliciousServiceCreated.EventData as CreatedEventData
+         | order by StoppedTime desc
+entityMappings:
+  - <insert entity mappings here>
+version: <e.g., 1.0.0>
+kind: <e.g., Scheduled>
