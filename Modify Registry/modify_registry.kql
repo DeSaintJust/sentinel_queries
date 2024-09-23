@@ -16,7 +16,8 @@ tactics:
 relevantTechniques:
   - <e.g., t144420>
 tags:
-  - <e.g., Tag Name>
+  - Ransomware
+  - Black Basta
 query: |
   DeviceRegistryEvents
   | where TimeGenerated >= ago(30d)  // Adjust the time range as needed
