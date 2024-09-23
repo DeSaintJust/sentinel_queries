@@ -19,8 +19,6 @@ tags:
   - Ransomware
   - Black Basta
 query: |
-           <insert query here>
-         
          let TimeWindow = 30d;  // Adjust the time window as needed
          
          // Define a list of suspicious processes commonly associated with malicious API calls
