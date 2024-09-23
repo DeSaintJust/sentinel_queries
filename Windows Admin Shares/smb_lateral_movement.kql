@@ -1,8 +1,32 @@
-SecurityEvent
-| where TimeGenerated >= ago(30d)  // Adjust the time range as needed
-| where EventID in (4624, 4625)  // 4624 = Successful logon, 4625 = Failed logon
-| where LogonType in (2, 3)  // Type 2 = Interactive, Type 3 = Network
-| where AccountName != "ANONYMOUS LOGON"  // Exclude anonymous logons
-| where TargetUserName != ""  // Ensure there is a target user
-| project TimeGenerated, AccountName, TargetUserName, SourceIpAddress, WorkstationName, LogonType, EventID
-| order by TimeGenerated desc
+name: <insert name here>
+description: |
+  <insert description here>
+severity: <insert severity here>
+status: <insert status here>
+requiredDataConnectors:
+  - connectorId: <insert connector ID here>
+    dataTypes:
+      - <insert required data types here>
+queryFrequency: <insert query frequency here>
+queryPeriod: <insert query period here>
+triggerOperator: <insert trigger operator here>
+triggerThreshold: <insert trigger threshold here>
+tactics:
+  - <e.g., InitialAccess>
+relevantTechniques:
+  - <e.g., t144420>
+tags:
+  - <e.g., Tag Name>
+query: |
+  SecurityEvent
+  | where TimeGenerated >= ago(30d)  // Adjust the time range as needed
+  | where EventID in (4624, 4625)  // 4624 = Successful logon, 4625 = Failed logon
+  | where LogonType in (2, 3)  // Type 2 = Interactive, Type 3 = Network
+  | where AccountName != "ANONYMOUS LOGON"  // Exclude anonymous logons
+  | where TargetUserName != ""  // Ensure there is a target user
+  | project TimeGenerated, AccountName, TargetUserName, SourceIpAddress, WorkstationName, LogonType, EventID
+  | order by TimeGenerated desc
+entityMappings:
+  - <insert entity mappings here>
+version: <e.g., 1.0.0>
+kind: <e.g., Scheduled>
